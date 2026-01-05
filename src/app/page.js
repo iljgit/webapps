@@ -1,66 +1,51 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { Container, Typography, Grid } from "@mui/material";
+import Hero from "@/components/Hero";
+import ActionCard from "@/components/ActionCard";
 
-export default function Home() {
+const services = [
+  {
+    title: "IP Service",
+    body: "Identify your public IP address quickly and easily.",
+    imageUrl: "/assets/ip.jpg",
+    href: "/ip",
+    ctaText: "Try it Now...",
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <>
+      <Hero
+        title="iSeeMy Portal"
+        subtitle="UK-based specialised web applets for global users."
+        imageUrl="/assets/home.jpg"
+      />
+      <Container sx={{ px: { xs: 2, md: 0 } }}>
+        <Typography variant="h4" gutterBottom>
+          Our Focus
+        </Typography>
+        <Typography variant="body1">
+          We provide high-performance, subscription-based tools for developers
+          of advanced web sites.
+        </Typography>
+      </Container>
+      <Container sx={{ mt: 2, px: { xs: 2, md: 0 } }}>
+        <Grid container sx={{ px: { xs: 2, md: 0 } }}>
+          {services.map((service, index) => {
+            return (
+              <Grid key={`service_${index}`} size={{ xs: 12, md: 4, lg: 3 }}>
+                <ActionCard
+                  title={service.title}
+                  body={service.body}
+                  imageUrl={service.imageUrl}
+                  href={service.href}
+                  ctaText={service.ctaText}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Container>
+    </>
   );
 }
