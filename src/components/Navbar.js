@@ -25,6 +25,8 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
 
+  console.log("Session data in Navbar:", session, status);
+
   // State for menus
   const [anchorElNav, setAnchorElNav] = useState(null); // Mobile Hamburger
   const [anchorElServices, setAnchorElServices] = useState(null); // Services Submenu

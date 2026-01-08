@@ -1,7 +1,8 @@
-// components/PaddleCheckout.js
+"use client";
 import { useEffect, useState } from "react";
 import { initializePaddle } from "@paddle/paddle-js";
 import { Button } from "@mui/material";
+import { useSession } from "next-auth/react";
 
 const token = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
 const isSandbox = process.env.NEXT_PUBLIC_PADDLE_SANDBOX === "true";
@@ -33,8 +34,11 @@ const usePaddle = () => {
   return paddle;
 };
 
-const PaddleCheckout = ({ priceId }) => {
+const PaddleCheckout = ({ priceId, text = "Buy now" }) => {
   const paddle = usePaddle();
+
+  const { data: session } = useSession();
+  const user = session?.user || {};
 
   function openCheckout(priceId) {
     if (!paddle) return;
@@ -46,6 +50,10 @@ const PaddleCheckout = ({ priceId }) => {
           quantity: 1,
         },
       ],
+      customer: {
+        email: user.email,
+        name: user.name,
+      },
     });
   }
 
@@ -55,7 +63,7 @@ const PaddleCheckout = ({ priceId }) => {
       variant="contained"
       color="secondary"
     >
-      Buy now
+      {text}
     </Button>
   );
 };

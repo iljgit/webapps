@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import Hero from "@/components/Hero";
 import PaddleCheckout from "@/components/PaddleCheckout";
-import SimpleCard from "@/components/SimpleCard";
+import SubscriptionCard from "@/components/SubscriptionCard";
 
 export default function IPPage() {
   const defOutput = "Enter a valid IP address and click Decode.";
@@ -114,7 +114,7 @@ export default function IPPage() {
           decoder in action. The results, in JSON format, will be shown below.
         </Typography>
         <Grid container spacing={2} sx={{ my: 2, mb: 4 }}>
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <TextField
               id="ipinput"
               label="IP Address"
@@ -126,7 +126,7 @@ export default function IPPage() {
 
           <Box width="100%" />
 
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Button variant="contained" onClick={handleDecode}>
               Decode
             </Button>
@@ -134,7 +134,7 @@ export default function IPPage() {
 
           <Box width="100%" />
 
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <div variant="contained">{output}</div>
           </Grid>
         </Grid>
@@ -164,7 +164,7 @@ export default function IPPage() {
                 size={{ xs: 12, md: 4, lg: 3 }}
                 sx={{ display: "flex", justifyContent: "center", p: 2 }}
               >
-                <SimpleCard
+                <SubscriptionCard
                   title={p.name}
                   body={body}
                   imageUrl={"/assets/ip.jpg"}

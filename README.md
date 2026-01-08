@@ -34,3 +34,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# Paddle payment provider
+
+Test account is under ilj@breato.co.uk
+
+Login url for test account: https://sandbox-vendors.paddle.com/
+
+## Test card numbers
+
+Card Type Card Number CVC - use any future date for end
+
+- Valid card without 3DS 4242 4242 4242 4242 100
+- Valid Visa debit card 4000 0566 5566 5556 100
+- Valid card with 3DS 4000 0038 0000 0446 100
+- Declined card 4000 0000 0000 0002 100
+- Success then subsequent declines 4000 0027 6000 3184 100
