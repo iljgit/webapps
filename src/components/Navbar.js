@@ -148,7 +148,15 @@ export default function Navbar() {
               textDecoration: "none",
             }}
           >
-            PORTAL
+            {/* <Image
+            src="/assets/iseemyblue.png"
+            alt="iSeeMy Logo"
+            sx={{
+              my: 1,
+              height: "40px !important",
+              display: { xs: "flex", md: "none" },
+            }}
+          /> */}
           </Typography>
 
           {/* --- DESKTOP NAVIGATION --- */}

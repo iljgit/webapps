@@ -15,7 +15,7 @@ export default function Hero({ title, subtitle, imageUrl }) {
         mb: 4,
       }}
     >
-      <Container>
+      <Container sx={{ px: "0px !important" }}>
         <Typography variant="h2" component="h1" sx={{ fontWeight: "bold" }}>
           {title}
         </Typography>
