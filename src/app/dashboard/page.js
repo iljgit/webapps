@@ -20,29 +20,13 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <Hero
-        title="IP Service"
-        subtitle={`Welcome back, ${session.user.name}`}
-        imageUrl="https://images.unsplash.com/photo-1558494949-ef010cbdcc51"
-      />
+      <Hero title="Your Dashboard" imageUrl="/assets/dashboard.jpg" />
       <Container>
         <Paper
           elevation={3}
           sx={{ p: 4, textAlign: "center", border: "1px solid #e0e0e0" }}
         >
-          <Typography variant="h5">Your Authorized Public IP:</Typography>
-          <Typography
-            variant="h2"
-            color="primary"
-            sx={{ mt: 2, fontWeight: "bold" }}
-          >
-            {ip.split(",")[0]}
-          </Typography>
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Logged in as: {session.user.email}
-            </Typography>
-          </Box>
+          <Typography variant="h5">Manage your subscriptions</Typography>
         </Paper>
       </Container>
     </>
