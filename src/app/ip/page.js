@@ -61,8 +61,14 @@ export default function IPPage() {
   useEffect(() => {
     const fetchPrices = async () => {
       const sort = (a, b) => {
-        if (a.billing_cycle.interval === b.billing_cycle.interval) return 0;
-        return a.billing_cycle.interval < b.billing_cycle.interval ? -1 : 1;
+        const aDisplayOrder = a?.custom_data?.display_order || 9999;
+        const bDisplayOrder = b?.custom_data?.display_order || 9999;
+
+        if (aDisplayOrder !== bDisplayOrder) {
+          return aDisplayOrder - bDisplayOrder;
+        } else {
+          return 0;
+        }
       };
 
       const res = await fetch("/api/products", {
@@ -79,7 +85,7 @@ export default function IPPage() {
 
       let data = await res.json();
       data = data.sort(sort);
-      console.log("Fetched prices:", data);
+
       setPrices(data);
     };
 
@@ -147,21 +153,36 @@ export default function IPPage() {
       <Container sx={{ px: { xs: 2, md: 0 } }}>
         <Grid container sx={{ px: { xs: 2, md: 0 } }}>
           {prices.map((p, index) => {
-            const unitPrice = `${(p.unit_price.amount / 100).toFixed(2)} ${
-              p.unit_price.currency_code
-            } / ${p.billing_cycle.interval}`;
+            const isFreeTrial = p?.custom_data?.trial === "true";
+            const buttonText = isFreeTrial
+              ? "Start Free Trial"
+              : "Subscribe Now";
+            const unitPrice = isFreeTrial
+              ? p?.custom_data?.period || "14 days"
+              : `${(p.unit_price.amount / 100).toFixed(2)} ${
+                  p.unit_price.currency_code
+                } / ${p.billing_cycle.interval}`;
+
+            const features = p?.custom_data?.features?.split(";;") || [];
+
             const body = (
               <>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   {unitPrice}
                 </Typography>
-                <Typography variant="body2">{p.description}</Typography>
+                {features.length > 0 && (
+                  <ul style={{ paddingLeft: "20px" }}>
+                    {features.map((feature, idx) => (
+                      <li key={`feature_${idx}`}>{feature}</li>
+                    ))}
+                  </ul>
+                )}
               </>
             );
             return (
               <Grid
                 key={`product_${index}`}
-                size={{ xs: 12, md: 4, lg: 3 }}
+                size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
                 sx={{ display: "flex", justifyContent: "center", p: 2 }}
               >
                 <SubscriptionCard
@@ -170,7 +191,13 @@ export default function IPPage() {
                   imageUrl={"/assets/ip.jpg"}
                   boxShadow={3}
                   button={
-                    <PaddleCheckout productId={p.product_id} priceId={p.id} />
+                    <PaddleCheckout
+                      productId={p.product_id}
+                      priceId={p.id}
+                      customData={p.custom_data}
+                      isFreeTrial={isFreeTrial}
+                      buttonText={buttonText}
+                    />
                   }
                 />
               </Grid>

@@ -60,6 +60,22 @@ export const authOptions = {
   pages: {
     signIn: "/login",
   },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.backendId = user.id; // Store the backend ID in the token
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // This happens whenever getServerSession is called
+      if (session.user) {
+        session.user.backendId = token.backendId; // Map the token value to the session
+      }
+      return session;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

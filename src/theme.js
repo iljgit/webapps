@@ -9,15 +9,15 @@ const inter = Inter({
   display: "swap",
 });
 
-const theme = createTheme({
+let theme = createTheme({
   palette: {
     primary: {
-      main: "#0F172A", // Deep Slate
+      main: "#3B82F6",
       light: "#334155",
-      dark: "#020617",
+      dark: "#1d4585", //"#020617",
     },
     secondary: {
-      main: "#3B82F6", // Electric Blue
+      main: "#3B82F6",
     },
     background: {
       default: "#F8FAFC",
@@ -28,10 +28,25 @@ const theme = createTheme({
       secondary: "#64748B",
     },
   },
+});
+
+theme = createTheme(theme, {
   typography: {
     fontFamily: inter.style.fontFamily,
-    h1: { fontWeight: 700, letterSpacing: "-0.02em" },
-    h2: { fontWeight: 700, letterSpacing: "-0.01em" },
+    h1: {
+      fontWeight: 700,
+      letterSpacing: "-0.02em",
+      color: theme.palette.primary.main,
+    },
+    h2: {
+      fontWeight: 700,
+      letterSpacing: "-0.01em",
+      color: theme.palette.primary.main,
+    },
+    h3: { fontWeight: 600, color: theme.palette.primary.main },
+    h4: { fontWeight: 600, color: theme.palette.primary.main },
+    h5: { fontWeight: 600, color: theme.palette.primary.main },
+    h6: { fontWeight: 600, color: theme.palette.primary.main },
     button: { textTransform: "none", fontWeight: 600 }, // No all-caps buttons (modern style)
   },
   shape: {

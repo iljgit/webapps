@@ -16,10 +16,16 @@ export default function Hero({ title, subtitle, imageUrl }) {
       }}
     >
       <Container sx={{ px: "0px !important" }}>
-        <Typography variant="h2" component="h1" sx={{ fontWeight: "bold" }}>
+        <Typography
+          variant="h2"
+          component="h1"
+          sx={{ fontWeight: "bold", color: "white" }}
+        >
           {title}
         </Typography>
-        <Typography variant="h5">{subtitle}</Typography>
+        <Typography variant="h5" sx={{ color: "white" }}>
+          {subtitle}
+        </Typography>
       </Container>
     </Box>
   );

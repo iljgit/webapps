@@ -19,13 +19,24 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
 
-  console.log("Session data in Navbar:", session, status);
+  const pathname = usePathname();
+
+  const handleLogin = () => {
+    const scrollY = Math.floor(window.scrollY);
+
+    // We embed the scroll position inside the callbackUrl itself
+    const returnUrl = `${pathname}?restoreScroll=${scrollY}`;
+
+    signIn(undefined, { callbackUrl: returnUrl });
+    // 'undefined' triggers the default sign-in page, or pass your provider ID like 'google'
+  };
 
   // State for menus
   const [anchorElNav, setAnchorElNav] = useState(null); // Mobile Hamburger
@@ -58,10 +69,7 @@ export default function Navbar() {
   }
 
   return (
-    <AppBar
-      position="sticky"
-      sx={{ bgcolor: "white", color: "black", boxShadow: 1 }}
-    >
+    <AppBar position="sticky" sx={{ bgcolor: "white", boxShadow: 1 }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* --- LOGO & STRAPLINE (Desktop) --- */}
@@ -97,7 +105,7 @@ export default function Navbar() {
                 color: "text.secondary",
               }}
             >
-              Innovating Web Applets
+              Innovative Web Applets
             </Typography>
           </Box>
 
@@ -163,15 +171,19 @@ export default function Navbar() {
 
           {/* --- DESKTOP NAVIGATION --- */}
           <Box
-            sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, gap: 1 }}
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", md: "flex" },
+              gap: 1,
+            }}
           >
-            <Button component={Link} href="/" sx={{ color: "black" }}>
+            <Button component={Link} href="/" sx={{ fontWeight: "800" }}>
               Home
             </Button>
 
             {/* Services Dropdown */}
             <Button
-              sx={{ color: "black" }}
+              sx={{}}
               endIcon={<KeyboardArrowDownIcon />}
               onClick={handleOpenServices}
             >
@@ -193,16 +205,12 @@ export default function Navbar() {
             </Menu>
 
             {session && (
-              <Button
-                component={Link}
-                href="/dashboard"
-                sx={{ color: "black" }}
-              >
+              <Button component={Link} href="/dashboard" sx={{}}>
                 Dashboard
               </Button>
             )}
 
-            <Button component={Link} href="/about" sx={{ color: "black" }}>
+            <Button component={Link} href="/about" sx={{}}>
               About
             </Button>
           </Box>
@@ -234,7 +242,7 @@ export default function Navbar() {
               <Button
                 variant="contained"
                 size="small"
-                onClick={() => signIn("google")}
+                onClick={handleLogin}
                 sx={{ borderRadius: "20px", px: 3 }}
               >
                 Login

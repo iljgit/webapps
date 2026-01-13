@@ -13,8 +13,12 @@ import {
   CircularProgress,
   Link,
   Paper,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,6 +30,16 @@ export default function SignupPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Toggles the visibility state of the password
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  // Prevents the focus from leaving the input when clicking the icon
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -96,7 +110,7 @@ export default function SignupPage() {
 
             <TextField
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               fullWidth
               required
               margin="normal"
@@ -104,11 +118,27 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               helperText="At least 8 characters"
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
 
             <TextField
               label="Confirm Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               fullWidth
               required
               margin="normal"

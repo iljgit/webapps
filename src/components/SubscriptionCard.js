@@ -39,6 +39,7 @@ export default function SubscriptionCard({
   return (
     <>
       <Card
+        size="sm"
         sx={{
           maxWidth: 345,
           boxShadow,
@@ -55,8 +56,13 @@ export default function SubscriptionCard({
           image={imageUrl}
           alt="Service"
         />
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="div">
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography
+            gutterBottom
+            variant="h6"
+            component="div"
+            sx={{ color: "text.primary" }}
+          >
             {title}
           </Typography>
           <Typography
@@ -91,8 +97,8 @@ export default function SubscriptionCard({
           <CloseIcon />
         </IconButton>
         <Typography sx={{ p: 2 }} variant="body1">
-          You need to be logged in to subscribe. Please login or register for an
-          account.
+          You need to be logged in to subscribe. Please log in or register for
+          an account.
         </Typography>
       </Dialog>
     </>
