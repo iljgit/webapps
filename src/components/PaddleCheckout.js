@@ -87,15 +87,95 @@ Example return data from Paddle Prices API:
 const token = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
 const isSandbox = process.env.NEXT_PUBLIC_PADDLE_SANDBOX === "true";
 
-const usePaddle = () => {
+const registerProduct = async (params) => {
+  const { product, user, transaction, productCode, callback, isFreeTrial } = {
+    ...params,
+  };
+
+  try {
+    const _product = {};
+    const _transaction = {};
+
+    _product.id = product.id;
+    _product.billingCycle = product.billing_cycle;
+    _product.customData = product.custom_data;
+    _product.unitPrice = product.unit_price;
+    _product.name = product.name;
+    _product.description = product.description;
+
+    _transaction.customer = transaction.customer;
+    _transaction.id = transaction.id;
+    _transaction.transactionId = transaction.transaction_id;
+    _transaction.status = transaction.status;
+
+    const body = {
+      action: "subscribe",
+      productCode,
+      product: _product,
+      user,
+      transaction: _transaction,
+      isFreeTrial,
+    };
+
+    const response = await fetch("/api/user/subscription", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      callback(data);
+    } else {
+      console.error(
+        "Failed to register product#2",
+        product,
+        user,
+        transaction,
+        response.status
+      );
+      callback({
+        success: false,
+        message:
+          "Your subscription could not be processed. Please try again later.",
+      });
+    }
+  } catch (error) {
+    console.error(
+      "Failed to register product#1",
+      product,
+      user,
+      transaction,
+      error
+    );
+    callback({
+      success: false,
+      message:
+        "There was a problem contacting our server. Please try again later.",
+    });
+  }
+};
+
+const usePaddle = (product, user, isFreeTrial, productCode, callback) => {
   const [paddle, setPaddle] = useState();
 
   useEffect(() => {
     const initObj = {
       environment: isSandbox ? "sandbox" : "production",
       token,
-      eventCallback: function (data) {
-        console.log("Paddle event callback", data);
+      eventCallback: function (transaction) {
+        transaction.data.source = "paddle";
+
+        registerProduct({
+          product,
+          user,
+          transaction: transaction.data,
+          isFreeTrial,
+          productCode,
+          callback,
+        });
       },
       checkout: {
         settings: {
@@ -109,24 +189,45 @@ const usePaddle = () => {
         setPaddle(paddleInstance);
       }
     });
-  }, []);
+  }, [product, user, isFreeTrial, productCode, callback]);
 
   return paddle;
 };
 
 const PaddleCheckout = ({
-  productId,
-  priceId,
-  customData,
+  product,
+  productCode,
   buttonText = "Buy now",
   isFreeTrial = false,
+  buttonDisabled = false,
+  callback,
 }) => {
-  const paddle = usePaddle();
+  const {
+    id: priceId,
+    product_id: productId,
+    custom_data: customData,
+  } = product;
 
   const { data: session } = useSession();
   const user = session?.user || {};
 
+  const paddle = usePaddle(product, user, isFreeTrial);
+
   function startFreeTrial() {
+    registerProduct({
+      product,
+      user,
+      transaction: {
+        source: "iseemy",
+        customer: { name: user.name, email: user.email },
+        id: `iseemyche_${Date.now()}_${user.email}`,
+        transaction_id: `iseemytxn_${Date.now()}_${user.email}`,
+        status: "processed",
+      },
+      isFreeTrial,
+      productCode,
+      callback,
+    });
     return;
   }
 
@@ -154,6 +255,7 @@ const PaddleCheckout = ({
       color="secondary"
       size="small"
       sx={{ width: "100%" }}
+      disabled={buttonDisabled}
     >
       {buttonText}
     </Button>

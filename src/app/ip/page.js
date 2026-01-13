@@ -9,15 +9,38 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import Hero from "@/components/Hero";
 import PaddleCheckout from "@/components/PaddleCheckout";
 import SubscriptionCard from "@/components/SubscriptionCard";
+import { useSession } from "next-auth/react";
 
 export default function IPPage() {
   const defOutput = "Enter a valid IP address and click Decode.";
   const [output, setOutput] = useState(defOutput);
   const [ipAddress, setIpAddress] = useState("");
   const [prices, setPrices] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [refresh, setRefresh] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [processResults, setProcessResults] = useState(null);
+
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
+
+  const processSubscriptionResult = (params) => {
+    setProcessResults(params);
+    setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setRefresh(Date.now());
+    setDialogOpen(false);
+  };
 
   const handleInputChange = (event) => {
     setIpAddress(event.target.value);
@@ -59,6 +82,30 @@ export default function IPPage() {
   };
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("/api/user/userdata");
+        if (response.ok) {
+          const data = await response.json();
+          const user = data.user;
+
+          setUserData(user);
+        } else {
+          console.error("Failed to fetch user data");
+        }
+      } catch (error) {
+        console.error("Error fetching API key:", error);
+      }
+    };
+
+    if (status !== "authenticated") {
+      return;
+    }
+
+    fetchUserData();
+  }, [status, refresh]);
+
+  useEffect(() => {
     const fetchPrices = async () => {
       const sort = (a, b) => {
         const aDisplayOrder = a?.custom_data?.display_order || 9999;
@@ -90,7 +137,7 @@ export default function IPPage() {
     };
 
     fetchPrices();
-  }, []);
+  }, [refresh]);
 
   return (
     <>
@@ -149,6 +196,11 @@ export default function IPPage() {
         <Typography variant="h4" gutterBottom={true} sx={{ mb: 2 }}>
           Subscribe now
         </Typography>
+        {!isAuthenticated && (
+          <Typography variant="body1" gutterBottom={true} sx={{ mb: 2 }}>
+            You must register / log in to subscribe
+          </Typography>
+        )}
       </Container>
       <Container sx={{ px: { xs: 2, md: 0 } }}>
         <Grid container sx={{ px: { xs: 2, md: 0 } }}>
@@ -162,6 +214,15 @@ export default function IPPage() {
               : `${(p.unit_price.amount / 100).toFixed(2)} ${
                   p.unit_price.currency_code
                 } / ${p.billing_cycle.interval}`;
+
+            let buttonDisabled = false;
+            if (!isAuthenticated) {
+              buttonDisabled = true;
+            } else if (!userData) {
+              buttonDisabled = true;
+            } else if (isFreeTrial && userData?.plan["ip"]) {
+              buttonDisabled = true;
+            }
 
             const features = p?.custom_data?.features?.split(";;") || [];
 
@@ -192,11 +253,12 @@ export default function IPPage() {
                   boxShadow={3}
                   button={
                     <PaddleCheckout
-                      productId={p.product_id}
-                      priceId={p.id}
-                      customData={p.custom_data}
+                      product={p}
+                      productCode="ip"
                       isFreeTrial={isFreeTrial}
                       buttonText={buttonText}
+                      buttonDisabled={buttonDisabled}
+                      callback={processSubscriptionResult}
                     />
                   }
                 />
@@ -205,6 +267,29 @@ export default function IPPage() {
           })}
         </Grid>
       </Container>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{ color: processResults?.success ? "darkgreen" : "darkred" }}
+        >
+          Subscription
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {processResults?.message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant="contained" autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
