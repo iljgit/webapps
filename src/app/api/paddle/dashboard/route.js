@@ -1,12 +1,7 @@
 export async function POST(request) {
   const vendorId = process.env.NEXT_PUBLIC_PADDLE_VENDOR_ID;
   const apiKey = process.env.PADDLE_PRODUCT_API_KEY;
-  const isSandbox = process.env.NEXT_PUBLIC_PADDLE_SANDBOX === "true";
-
-  // const url = "https://vendors.paddle.com/api/2.0/product/get_products";
-  const urlRoot = isSandbox
-    ? "https://sandbox-api.paddle.com/"
-    : "https://api.paddle.com/";
+  const urlRoot = process.env.PADDLE_URL_ROOT;
 
   if (!vendorId || !apiKey) {
     return new Response(
@@ -19,19 +14,18 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { productCode } = { ...body };
-    const productId = process.env[`PADDLE_${productCode}_PRODUCT_ID`];
-    if (!productId) {
-      return new Response(JSON.stringify({ error: "Unknown product" }), {
+    const { customerId } = { ...body };
+    if (!customerId) {
+      return new Response(JSON.stringify({ error: "Unknown user" }), {
         status: 500,
       });
     }
 
     // get the prices
     const response = await fetch(
-      `${urlRoot}prices?status=active&product_id=${productId}`,
+      `${urlRoot}customers/${customerId}/portal-sessions`,
       {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
@@ -44,7 +38,7 @@ export async function POST(request) {
     if (!response.ok) {
       return res
         .status(500)
-        .json({ error: "Failed to fetch products", details: data });
+        .json({ error: "Failed to fetch user overview", details: data });
     }
 
     return new Response(JSON.stringify(data.data), {

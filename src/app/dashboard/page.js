@@ -14,6 +14,32 @@ import CircularProgress from "@mui/material/CircularProgress";
 function Plan({ index, plan }) {
   const keyRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  const [overview, setOverview] = useState(null);
+
+  useEffect(() => {
+    if (plan.isFreeTrial || !plan?.transaction?.customer?.id) {
+      return;
+    }
+
+    const fetchLinks = async () => {
+      const res = await fetch("/api/paddle/dashboard", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ customerId: plan.transaction.customer.id }),
+      });
+
+      if (!res.ok) {
+        return console.error("Failed to fetch overviews");
+      }
+
+      let data = await res.json();
+      setOverview(data?.urls?.general?.overview);
+    };
+
+    fetchLinks();
+  }, [plan.isFreeTrial, plan?.transaction?.customer?.id]);
 
   const handleCopy = async (ref) => {
     if (ref.current) {
@@ -68,6 +94,21 @@ function Plan({ index, plan }) {
             Copy URL
           </Button>
         </Tooltip>
+        {overview && (
+          <Tooltip title={"Manage your payment details"}>
+            <Button
+              component="a"
+              variant="contained"
+              color="success"
+              sx={{ mr: 2 }}
+              href={overview}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Payment details
+            </Button>
+          </Tooltip>
+        )}
       </Typography>
     </React.Fragment>
   );

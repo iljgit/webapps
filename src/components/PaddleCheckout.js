@@ -127,7 +127,9 @@ const registerProduct = async (params) => {
 
     if (response.ok) {
       const data = await response.json();
-      callback(data);
+      if (callback) {
+        callback(data);
+      }
     } else {
       console.error(
         "Failed to register product#2",
@@ -136,11 +138,14 @@ const registerProduct = async (params) => {
         transaction,
         response.status
       );
-      callback({
-        success: false,
-        message:
-          "Your subscription could not be processed. Please try again later.",
-      });
+
+      if (callback) {
+        callback({
+          success: false,
+          message:
+            "Your subscription could not be processed. Please try again later.",
+        });
+      }
     }
   } catch (error) {
     console.error(
@@ -166,16 +171,16 @@ const usePaddle = (product, user, isFreeTrial, productCode, callback) => {
       environment: isSandbox ? "sandbox" : "production",
       token,
       eventCallback: function (transaction) {
-        transaction.data.source = "paddle";
-
-        registerProduct({
-          product,
-          user,
-          transaction: transaction.data,
-          isFreeTrial,
-          productCode,
-          callback,
-        });
+        if (transaction.name === "checkout.completed") {
+          registerProduct({
+            product,
+            user,
+            transaction: transaction.data,
+            isFreeTrial,
+            productCode,
+            callback,
+          });
+        }
       },
       checkout: {
         settings: {
@@ -211,7 +216,7 @@ const PaddleCheckout = ({
   const { data: session } = useSession();
   const user = session?.user || {};
 
-  const paddle = usePaddle(product, user, isFreeTrial);
+  const paddle = usePaddle(product, user, isFreeTrial, productCode, callback);
 
   function startFreeTrial() {
     registerProduct({

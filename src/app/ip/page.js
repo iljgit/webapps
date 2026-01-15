@@ -118,7 +118,7 @@ export default function IPPage() {
         }
       };
 
-      const res = await fetch("/api/products", {
+      const res = await fetch("/api/paddle/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
